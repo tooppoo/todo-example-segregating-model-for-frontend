@@ -1,0 +1,19 @@
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: white;
+  border-radius: 8px;
+  color: #666;
+}
+
+.empty-state .hint {
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  color: #999;
+}

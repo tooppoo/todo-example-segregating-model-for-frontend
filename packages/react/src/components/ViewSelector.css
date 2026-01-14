@@ -1,0 +1,26 @@
+.view-selector {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.view-btn {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.view-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.view-btn.active {
+  background: white;
+  color: #4a90d9;
+  font-weight: 500;
+}
