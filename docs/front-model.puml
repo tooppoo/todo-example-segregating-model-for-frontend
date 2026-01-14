@@ -1,0 +1,204 @@
+@startuml フロントエンドモデル
+
+package "View State" {
+  enum ViewType {
+    INBOX
+    PROJECT
+    TRASH
+  }
+
+  enum SortType {
+    MANUAL
+    CREATED_AT
+    DUE_AT
+    PRIORITY
+  }
+
+  enum StatusFilter {
+    ACTIVE
+    COMPLETED
+  }
+
+  class DueFilter {
+    - type: "exact" | "until"
+    - date: Date
+    + matches(dueAt: Date | null): boolean
+  }
+  note bottom of DueFilter
+    exact: dueAt == date
+    until: dueAt <= date
+    dueAtがnullの場合は常にfalse
+  end note
+
+  class FilterState {
+    query: string | null
+    tags: string[]
+    priority: Priority | null
+    status: StatusFilter | null
+    due: DueFilter | null
+  }
+  FilterState o--> DueFilter
+  FilterState ..> StatusFilter
+
+  class ViewState {
+    view: ViewType
+    sort: SortType
+    filter: FilterState
+    + isDragDropEnabled(): boolean
+  }
+  ViewState o--> ViewType
+  ViewState o--> SortType
+  ViewState o--> FilterState
+  note right of ViewState::isDragDropEnabled
+    sort == MANUAL の場合のみtrue
+  end note
+}
+
+package "URL Sync" {
+  class QueryParams <<ValueObject>> {
+    q: string | null
+    tags: string | null
+    priority: string | null
+    status: string | null
+    view: string | null
+    sort: string | null
+    due: string | null
+  }
+
+  class QueryParamsCodec {
+    + encode(state: ViewState): QueryParams
+    + decode(params: QueryParams): ViewState
+  }
+  QueryParamsCodec ..> QueryParams
+  QueryParamsCodec ..> ViewState
+}
+
+package "Display Model" {
+  class DisplayTask <<ValueObject>> {
+    id: number
+    slug: string
+    title: string
+    description: string
+    priority: Priority
+    tags: Tag[]
+    dueAt: Date | null
+    manualSortPosition: number
+    archivedAt: Date | null
+  }
+  note bottom of DisplayTask
+    ActiveTaskとArchivedTaskを
+    統一的に扱うための表示用モデル
+  end note
+
+  class TaskSection <<ValueObject>> {
+    label: string
+    tasks: DisplayTask[]
+    + isEmpty(): boolean
+  }
+  TaskSection o--> "*" DisplayTask
+
+  class TaskListView <<ValueObject>> {
+    withDue: TaskSection
+    withoutDue: TaskSection
+    + allTasks(): DisplayTask[]
+    + visibleTaskIds(): number[]
+  }
+  TaskListView o--> "2" TaskSection
+  note right of TaskListView
+    表示用に整形された
+    セクション分離済みリスト
+  end note
+}
+
+package "List Operations" {
+  class TaskFilter {
+    + apply(tasks: DisplayTask[], filter: FilterState): DisplayTask[]
+  }
+  TaskFilter ..> DisplayTask
+  TaskFilter ..> FilterState
+
+  class TaskSorter {
+    + sort(tasks: DisplayTask[], sortType: SortType): DisplayTask[]
+  }
+  TaskSorter ..> DisplayTask
+  TaskSorter ..> SortType
+
+  class TaskListBuilder {
+    + build(tasks: DisplayTask[], state: ViewState): TaskListView
+  }
+  TaskListBuilder ..> DisplayTask
+  TaskListBuilder ..> ViewState
+  TaskListBuilder ..> TaskListView
+  TaskListBuilder ..> TaskFilter
+  TaskListBuilder ..> TaskSorter
+}
+
+package "Drag & Drop" {
+  class DragContext <<ValueObject>> {
+    sourceIndex: number
+    sourceSection: "withDue" | "withoutDue"
+    task: DisplayTask
+  }
+
+  class DropTarget <<ValueObject>> {
+    targetIndex: number
+    targetSection: "withDue" | "withoutDue"
+  }
+
+  class ReorderResult <<ValueObject>> {
+    movedTask: DisplayTask
+    newGlobalOrder: number[]
+  }
+  note bottom of ReorderResult
+    フィルタ中の並び替えでも
+    全体順序を正しく計算
+  end note
+
+  class ManualOrderResolver {
+    - globalOrder: number[]
+    - visibleOrder: number[]
+    + reorder(drag: DragContext, drop: DropTarget): ReorderResult
+  }
+  ManualOrderResolver ..> DragContext
+  ManualOrderResolver ..> DropTarget
+  ManualOrderResolver ..> ReorderResult
+  note right of ManualOrderResolver
+    フィルタ中のD&D時に
+    全体順序への反映を計算
+    ---
+    仕様セクション3の
+    ルールを実装
+  end note
+}
+
+package "Section Transfer" {
+  class DueChangeHandler {
+    + addDue(task: DisplayTask, dueAt: Date): SectionTransfer
+    + removeDue(task: DisplayTask): SectionTransfer
+  }
+
+  class SectionTransfer <<ValueObject>> {
+    task: DisplayTask
+    fromSection: "withDue" | "withoutDue"
+    toSection: "withDue" | "withoutDue"
+    insertPosition: "head" | "tail"
+  }
+  note bottom of SectionTransfer
+    期限なし→あり: 期限ありセクションの先頭
+    期限あり→なし: 期限なしセクションの末尾
+  end note
+
+  DueChangeHandler ..> DisplayTask
+  DueChangeHandler ..> SectionTransfer
+}
+
+' Domain Model との関連
+package "Domain Bridge" {
+  interface TaskAdapter {
+    + toDisplayTask(task: ActiveTask | ArchivedTask): DisplayTask
+    + toActiveTask(display: DisplayTask): ActiveTask
+  }
+  TaskAdapter ..> DisplayTask
+}
+
+@enduml

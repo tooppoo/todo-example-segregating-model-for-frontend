@@ -1,0 +1,17 @@
+{
+  "name": "todo-example-segregating-model-for-frontend",
+  "version": "0.0.1",
+  "private": true,
+  "description": "TODO application example for frontend architecture",
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.0"
+  },
+  "packageManager": "pnpm@10.26.1"
+}
