@@ -77,13 +77,13 @@ function matchesStatus(
     return true;
   }
 
-  const isTaskArchived = task.archivedAt !== null;
+  const isTaskCompleted = task.completedAt !== null;
 
   switch (status) {
     case StatusFilter.ACTIVE:
-      return !isTaskArchived;
+      return !isTaskCompleted;
     case StatusFilter.COMPLETED:
-      return isTaskArchived;
+      return isTaskCompleted;
   }
 }
 

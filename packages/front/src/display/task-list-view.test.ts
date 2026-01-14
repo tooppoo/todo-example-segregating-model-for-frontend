@@ -19,6 +19,7 @@ function createTestTask(id: number, hasDue: boolean = false) {
     createdAt: new Date("2026-01-01"),
     manualSortPosition: id * 100,
     dueAt: hasDue ? new Date("2026-01-14") : null,
+    completedAt: null,
     archivedAt: null,
   });
 }

@@ -83,6 +83,7 @@ package "Display Model" {
     tags: Tag[]
     dueAt: Date | null
     manualSortPosition: number
+    completedAt: Date | null
     archivedAt: Date | null
   }
   note bottom of DisplayTask

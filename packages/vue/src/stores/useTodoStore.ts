@@ -22,16 +22,7 @@ import {
   removeDue,
   updateDisplayTask,
   isArchived,
-  createTag,
 } from "@todo-example/front";
-
-// Helper tag for completion status
-const COMPLETED_TAG_ID = -1;
-const completedTag: Tag = createTag({ id: COMPLETED_TAG_ID, slug: "completed", name: "completed" });
-
-function hasCompletedTag(task: DisplayTask): boolean {
-  return task.tags.some((t) => t.id === COMPLETED_TAG_ID);
-}
 
 export interface TodoStore {
   tasks: Ref<DisplayTask[]>;
@@ -116,6 +107,7 @@ export function useTodoStore(): TodoStore {
       dueAt,
       createdAt: now,
       manualSortPosition: position,
+      completedAt: null,
       archivedAt: null,
     });
 
@@ -145,20 +137,20 @@ export function useTodoStore(): TodoStore {
 
   function completeTask(id: number): void {
     const task = tasks.value.find((t) => t.id === id);
-    if (task && !hasCompletedTag(task)) {
-      updateTask(id, { tags: [...task.tags, completedTag] });
+    if (task && task.completedAt === null) {
+      updateTask(id, { completedAt: new Date() });
     }
   }
 
   function uncompleteTask(id: number): void {
     const task = tasks.value.find((t) => t.id === id);
-    if (task) {
-      updateTask(id, { tags: task.tags.filter((tag) => tag.id !== COMPLETED_TAG_ID) });
+    if (task && task.completedAt !== null) {
+      updateTask(id, { completedAt: null });
     }
   }
 
   function isTaskCompleted(task: DisplayTask): boolean {
-    return hasCompletedTag(task);
+    return task.completedAt !== null;
   }
 
   function setTaskDue(id: number, dueAt: Date | null): void {

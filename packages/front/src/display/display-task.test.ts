@@ -20,6 +20,7 @@ function createTestTask(
     createdAt: new Date("2026-01-01"),
     manualSortPosition: 0,
     dueAt: null,
+    completedAt: null,
     archivedAt: null,
     ...overrides,
   });
@@ -63,16 +64,19 @@ describe("DisplayTask", () => {
     it("should create a copy of dates", () => {
       const dueAt = new Date("2026-01-14");
       const createdAt = new Date("2026-01-01");
+      const completedAt = new Date("2026-01-12");
       const archivedAt = new Date("2026-01-10");
 
-      const task = createTestTask({ dueAt, createdAt, archivedAt });
+      const task = createTestTask({ dueAt, createdAt, completedAt, archivedAt });
 
       dueAt.setFullYear(2020);
       createdAt.setFullYear(2020);
+      completedAt.setFullYear(2020);
       archivedAt.setFullYear(2020);
 
       expect(task.dueAt?.getFullYear()).toBe(2026);
       expect(task.createdAt.getFullYear()).toBe(2026);
+      expect(task.completedAt?.getFullYear()).toBe(2026);
       expect(task.archivedAt?.getFullYear()).toBe(2026);
     });
 
@@ -84,6 +88,11 @@ describe("DisplayTask", () => {
     it("should handle null archivedAt", () => {
       const task = createTestTask({ archivedAt: null });
       expect(task.archivedAt).toBeNull();
+    });
+
+    it("should handle null completedAt", () => {
+      const task = createTestTask({ completedAt: null });
+      expect(task.completedAt).toBeNull();
     });
   });
 

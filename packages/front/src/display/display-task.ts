@@ -11,6 +11,7 @@ export interface DisplayTask {
   readonly dueAt: Date | null;
   readonly createdAt: Date;
   readonly manualSortPosition: number;
+  readonly completedAt: Date | null;
   readonly archivedAt: Date | null;
 }
 
@@ -27,6 +28,7 @@ export function createDisplayTask(
     dueAt: params.dueAt ? new Date(params.dueAt.getTime()) : null,
     createdAt: new Date(params.createdAt.getTime()),
     manualSortPosition: params.manualSortPosition,
+    completedAt: params.completedAt ? new Date(params.completedAt.getTime()) : null,
     archivedAt: params.archivedAt ? new Date(params.archivedAt.getTime()) : null,
   });
 }

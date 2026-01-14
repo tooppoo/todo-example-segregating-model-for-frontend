@@ -6,6 +6,7 @@ package model {
     slug: string
     title: string
     description: string
+    completedAt: DateTime | null
   }
   enum Priority {
     LOW

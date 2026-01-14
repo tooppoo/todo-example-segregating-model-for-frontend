@@ -20,6 +20,7 @@ function createTestTask(
     createdAt: new Date("2026-01-01"),
     manualSortPosition: id * 100,
     dueAt: null,
+    completedAt: null,
     archivedAt: null,
     ...overrides,
   });
@@ -178,28 +179,28 @@ describe("TaskFilter", () => {
       });
 
       it("should match active tasks when filter is ACTIVE", () => {
-        const task = createTestTask(1, { archivedAt: null });
+        const task = createTestTask(1, { completedAt: null });
         const filter = createFilterState({ status: StatusFilter.ACTIVE });
 
         expect(matchesFilter(task, filter)).toBe(true);
       });
 
-      it("should not match archived tasks when filter is ACTIVE", () => {
-        const task = createTestTask(1, { archivedAt: new Date() });
+      it("should not match completed tasks when filter is ACTIVE", () => {
+        const task = createTestTask(1, { completedAt: new Date() });
         const filter = createFilterState({ status: StatusFilter.ACTIVE });
 
         expect(matchesFilter(task, filter)).toBe(false);
       });
 
-      it("should match archived tasks when filter is COMPLETED", () => {
-        const task = createTestTask(1, { archivedAt: new Date() });
+      it("should match completed tasks when filter is COMPLETED", () => {
+        const task = createTestTask(1, { completedAt: new Date() });
         const filter = createFilterState({ status: StatusFilter.COMPLETED });
 
         expect(matchesFilter(task, filter)).toBe(true);
       });
 
       it("should not match active tasks when filter is COMPLETED", () => {
-        const task = createTestTask(1, { archivedAt: null });
+        const task = createTestTask(1, { completedAt: null });
         const filter = createFilterState({ status: StatusFilter.COMPLETED });
 
         expect(matchesFilter(task, filter)).toBe(false);

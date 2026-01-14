@@ -4,8 +4,6 @@ import type { DisplayTask } from "@todo-example/front";
 import { Priority, ViewType } from "@todo-example/front";
 import type { TodoStore } from "../stores/useTodoStore";
 
-const COMPLETED_TAG_ID = -1;
-
 const props = defineProps<{
   task: DisplayTask;
 }>();
@@ -20,9 +18,7 @@ const editDueAt = ref<string>("");
 const isCompleted = computed(() => store.isTaskCompleted(props.task));
 const isTrashView = computed(() => store.viewState.value.view === ViewType.TRASH);
 
-const displayTags = computed(() =>
-  props.task.tags.filter((t) => t.id !== COMPLETED_TAG_ID)
-);
+const displayTags = computed(() => props.task.tags);
 
 const priorityClass = computed(() => `priority-${props.task.priority}`);
 
