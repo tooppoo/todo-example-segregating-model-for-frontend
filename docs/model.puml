@@ -1,0 +1,94 @@
+@startuml ドメインモデル
+
+package model {
+  interface Task <<Entity, AggregateRoot>> {
+    id: number
+    slug: string
+    title: string
+    description: string
+  }
+  enum Priority {
+    LOW
+    MEDIUM
+    HIGH
+    NONE
+  }
+  note bottom of Priority
+    優先度を表す列挙型
+    NONEは優先度未設定
+  end note
+
+  class Tag <<Entity>> {
+    id: number
+    slug: string
+    name: string
+  }
+  Task o-l-> "*" Tag
+  Task o-r-> "1" Priority
+
+  interface ActiveTask {
+    manualSortPosition: number
+  }
+  ActiveTask --|> Task
+  class ActiveTaskList {
+    withDue: TaskWithDue[]
+    withoutDue: TaskWithoutDue[]
+  }
+  ActiveTaskList o--> "*" TaskWithDue
+  ActiveTaskList o--> "*" TaskWithoutDue
+
+  TaskWithoutDue ..|> ActiveTask
+  class TaskWithDue {
+    - dueDate: DateTime
+  }
+  TaskWithDue ..|> ActiveTask
+
+  class ArchivedTask {
+    - archivedAt: DateTime
+    - dueDate: DateTime | null
+  }
+  ArchivedTask ..|> Task
+
+  interface ActiveTaskRepository {
+    list(): Promise<ActiveTaskList>
+    add(task: ActiveTask): Promise<void>
+    save(task: ActiveTask): Promise<void>
+    remove(task: ActiveTask): Promise<void>
+  }
+  ActiveTaskRepository ..> ActiveTask
+  ActiveTaskRepository ..> ActiveTaskList
+
+  interface ArchivedTaskRepository {
+    list(): Promise<ArchivedTask[]>
+    add(task: ArchivedTask): Promise<void>
+    remove(task: ArchivedTask): Promise<void>
+  }
+  ArchivedTaskRepository ...> ArchivedTask
+}
+
+package command {
+  class CreateNewTask
+  CreateNewTask --> TaskWithoutDue
+  CreateNewTask ..> ActiveTaskRepository
+
+  class MoveTaskPosition
+  MoveTaskPosition ..> ActiveTaskRepository
+  MoveTaskPosition ..> ActiveTask
+
+  class ArchiveTask
+  ArchiveTask ..> ActiveTask
+  ArchiveTask ..> ActiveTaskRepository
+  ArchiveTask ..> ArchivedTaskRepository
+
+  class RestoreTask
+  RestoreTask --> ArchivedTask
+  RestoreTask ..> ActiveTaskRepository
+  RestoreTask ..> ArchivedTaskRepository
+  note top of RestoreTask
+    ArchivedTaskをActiveTaskに戻す
+    ---
+    復元後のデータ型はdueDateの有無によって決定する
+  end note
+}
+
+@enduml

@@ -1,0 +1,41 @@
+
+@startuml 想定ER図
+entity Task {
+  * task_id: number
+  --
+  slug: string
+  title: string
+  description: string
+  dueDate: DateTime | null
+  priority: HIGH | MEDIUM | LOW | NONE
+}
+
+entity TaskTag {
+  * task_id: number
+  * tag_id: number
+}
+entity Tag {
+  * id: number
+  --
+  slug: string
+  name: string
+}
+
+Task |o-u-o{ TaskTag
+TaskTag }o-u-o| Tag
+
+entity ActiveTask {
+  * task_id: number
+  --
+  manual_sort_position: number
+}
+ActiveTask |o-u-|| Task
+
+entity ArchivedTask {
+  * task_id: number
+  --
+  archived_at: DateTime
+}
+ArchivedTask |o-u-|| Task
+
+@enduml
