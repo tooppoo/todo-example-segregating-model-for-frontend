@@ -58,7 +58,7 @@ packages/
 ├─ front/     # フレームワーク非依存のアプリケーションコア
 ├─ react/     # React による UI 実装
 ├─ vue/       # Vue による UI 実装
-└─ jquery/    # jQueryによる UI 実装
+└─ svelte/    # Svelteによる UI 実装
 
 ```
 

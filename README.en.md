@@ -53,7 +53,7 @@ packages/
 ├─ front/     # framework-agnostic application core
 ├─ react/     # React UI implementation
 ├─ vue/       # Vue UI implementation
-└─ jquery/    # jQuery UI implementation
+└─ sevlte/    # Svelte UI implementation
 ```
 
 ### Dependency rules
