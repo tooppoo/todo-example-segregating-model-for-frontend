@@ -9,3 +9,4 @@ export {
   removeDue,
   changeDue,
 } from "./due-change-handler.js";
+export { setTaskDueInList } from "./task-due-updater.js";

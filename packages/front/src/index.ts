@@ -92,4 +92,5 @@ export {
   addDue,
   removeDue,
   changeDue,
+  setTaskDueInList,
 } from "./section-transfer/index.js";

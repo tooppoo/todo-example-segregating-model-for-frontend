@@ -7,6 +7,7 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
+    "front": "pnpm --filter @todo-example/front",
     "vue": "pnpm --filter @todo-example/vue",
     "react": "pnpm --filter @todo-example/react",
     "svelte": "pnpm --filter @todo-example/svelte",

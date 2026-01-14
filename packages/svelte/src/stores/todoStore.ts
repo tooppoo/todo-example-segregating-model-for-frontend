@@ -18,8 +18,7 @@ import {
   updateViewState,
   resolveManualOrder,
   calculateNewPositions,
-  addDue,
-  removeDue,
+  setTaskDueInList,
   updateDisplayTask,
   isArchived,
 } from "@todo-example/front";
@@ -151,40 +150,7 @@ export function isTaskCompleted(task: DisplayTask): boolean {
 }
 
 export function setTaskDue(id: number, dueAt: Date | null): void {
-  tasks.update((prev) => {
-    const task = prev.find((item) => item.id === id);
-    if (!task) {
-      return prev;
-    }
-
-    if (dueAt === null && task.dueAt !== null) {
-      const withoutDueTasks = prev.filter(
-        (item) => item.dueAt === null && !isArchived(item)
-      );
-      const result = removeDue(task, withoutDueTasks);
-      return prev.map((item) =>
-        item.id === id ? result.updatedTask : item
-      );
-    }
-
-    if (dueAt !== null && task.dueAt === null) {
-      const withDueTasks = prev.filter(
-        (item) => item.dueAt !== null && !isArchived(item)
-      );
-      const result = addDue(task, dueAt, withDueTasks);
-      return prev.map((item) =>
-        item.id === id ? result.updatedTask : item
-      );
-    }
-
-    if (dueAt !== null) {
-      return prev.map((item) =>
-        item.id === id ? updateDisplayTask(item, { dueAt }) : item
-      );
-    }
-
-    return prev;
-  });
+  tasks.update((prev) => setTaskDueInList(prev, id, dueAt));
 }
 
 export function setTaskPriority(id: number, priority: Priority): void {

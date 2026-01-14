@@ -18,8 +18,7 @@ import {
   updateViewState,
   resolveManualOrder,
   calculateNewPositions,
-  addDue,
-  removeDue,
+  setTaskDueInList,
   updateDisplayTask,
   isArchived,
 } from "@todo-example/front";
@@ -154,31 +153,7 @@ export function useTodoStore(): TodoStore {
   }
 
   function setTaskDue(id: number, dueAt: Date | null): void {
-    const task = tasks.value.find((t) => t.id === id);
-    if (!task) return;
-
-    if (dueAt === null && task.dueAt !== null) {
-      // Remove due date
-      const withoutDueTasks = tasks.value.filter(
-        (t) => t.dueAt === null && !isArchived(t)
-      );
-      const result = removeDue(task, withoutDueTasks);
-      tasks.value = tasks.value.map((t) =>
-        t.id === id ? result.updatedTask : t
-      );
-    } else if (dueAt !== null && task.dueAt === null) {
-      // Add due date
-      const withDueTasks = tasks.value.filter(
-        (t) => t.dueAt !== null && !isArchived(t)
-      );
-      const result = addDue(task, dueAt, withDueTasks);
-      tasks.value = tasks.value.map((t) =>
-        t.id === id ? result.updatedTask : t
-      );
-    } else if (dueAt !== null) {
-      // Change due date (same section)
-      updateTask(id, { dueAt });
-    }
+    tasks.value = setTaskDueInList(tasks.value, id, dueAt);
   }
 
   function setTaskPriority(id: number, priority: Priority): void {
