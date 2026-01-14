@@ -1,0 +1,193 @@
+<script lang="ts">
+  import { addTask } from "../stores/todoStore";
+
+  let title = "";
+  let description = "";
+  let dueAt = "";
+  let isExpanded = false;
+
+  function handleSubmit() {
+    if (!title.trim()) {
+      return;
+    }
+
+    const due = dueAt ? new Date(dueAt) : null;
+    addTask(title.trim(), description.trim(), due);
+
+    title = "";
+    description = "";
+    dueAt = "";
+    isExpanded = false;
+  }
+
+  function handleKeyDown(event: KeyboardEvent) {
+    if (event.key === "Enter" && !event.shiftKey && !isExpanded) {
+      event.preventDefault();
+      handleSubmit();
+    }
+  }
+
+  function expand() {
+    isExpanded = true;
+  }
+
+  function collapse() {
+    if (!title && !description && !dueAt) {
+      isExpanded = false;
+    }
+  }
+</script>
+
+<div class={`task-form${isExpanded ? " expanded" : ""}`}>
+  <div class="input-row">
+    <input
+      bind:value={title}
+      type="text"
+      class="title-input"
+      placeholder="Add a new task..."
+      on:focus={expand}
+      on:blur={collapse}
+      on:keydown={handleKeyDown}
+    />
+    <button class="add-btn" disabled={!title.trim()} on:click={handleSubmit}>
+      Add
+    </button>
+  </div>
+
+  {#if isExpanded}
+    <div class="expanded-fields">
+      <textarea
+        bind:value={description}
+        class="description-input"
+        placeholder="Description (optional)"
+        rows="2"
+      />
+      <div class="form-row">
+        <div class="field">
+          <label for="dueAt">Due Date</label>
+          <input id="dueAt" bind:value={dueAt} type="date" class="date-input" />
+        </div>
+      </div>
+    </div>
+  {/if}
+</div>
+
+<style>
+  .task-form {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+  }
+
+  .task-form.expanded {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .input-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .title-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.15s ease;
+  }
+
+  .title-input:focus {
+    outline: none;
+    border-color: #4a90d9;
+  }
+
+  .add-btn {
+    padding: 0.75rem 1.5rem;
+    background: #4a90d9;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+
+  .add-btn:hover:not(:disabled) {
+    background: #3a7bc8;
+  }
+
+  .add-btn:disabled {
+    background: #b0c4de;
+    cursor: not-allowed;
+  }
+
+  .expanded-fields {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    animation: slideDown 0.2s ease;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .description-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    resize: vertical;
+    font-family: inherit;
+  }
+
+  .description-input:focus {
+    outline: none;
+    border-color: #4a90d9;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .field {
+    flex: 1;
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+  }
+
+  .date-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.875rem;
+  }
+
+  .date-input:focus {
+    outline: none;
+    border-color: #4a90d9;
+  }
+</style>

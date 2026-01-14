@@ -9,6 +9,7 @@
     "test:coverage": "turbo run test:coverage",
     "vue": "pnpm --filter @todo-example/vue",
     "react": "pnpm --filter @todo-example/react",
+    "svelte": "pnpm --filter @todo-example/svelte",
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
